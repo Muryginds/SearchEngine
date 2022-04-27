@@ -1,34 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-    <property name="LOG_DIR" value="/logs" />
-    <property name="LOG_FILE" value="LogFile" />
+    <property name="LOGS" value="./logs" />
 
-    <appender name="Console"
-      class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %black(%d{ISO8601}) %highlight(%-5level) [%blue(%t)] %yellow(%C{1.}): %msg%n%throwable
-            </Pattern>
-        </layout>
-    </appender>
-
-    <appender name="LogFile"
-      class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_DIR}/${LOG_FILE}.log</file>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d %p %C{1.} [%t] %m%n</Pattern>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %black(%d{HH:mm:ss.SSS}) %highlight([%thread]) %yellow(%-5level) [%blue(%logger{36})] - %msg%n%throwable
+            </pattern>
         </encoder>
     </appender>
 
-    <logger name="com.muryginds.searchEngine" level="trace" additivity="false">
-        <appender-ref ref="LogFile" />
-        <appender-ref ref="Console" />
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOGS}/logFile.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.muryginds.searchEngine" level="info">
+        <appender-ref ref="FILE" />
     </logger>
 
-    <root level="error">
-        <appender-ref ref="LogFile" />
-        <appender-ref ref="Console" />
+    <root level="info">
+        <appender-ref ref="STDOUT" />
     </root>
-
- </configuration>
+</configuration>
