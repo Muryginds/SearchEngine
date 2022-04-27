@@ -1,12 +1,12 @@
 package com.muryginds.searchEngine.parser;
 
 import com.muryginds.searchEngine.model.Page;
-import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class SiteParser {
+public class LinkParser {
 
   private final ForkJoinPool forkJoinPool = new ForkJoinPool();
   public void parse(String siteUrl) {
@@ -20,12 +20,12 @@ public class SiteParser {
 
     forkJoinPool.invoke(linkParserTask);
 
-    Map<String, Page> map = linkParserTask.getResults();
+    Set<Page> results = linkParserTask.getResults();
     double time = (System.currentTimeMillis() - start)/1000d;
     usage = (runtime.totalMemory() - runtime.freeMemory() - usage)/1024/1024;
     StringBuilder builder = new StringBuilder();
       builder.append("Scan finished. Total links: ")
-          .append(map.size())
+          .append(results.size())
           .append(". Time: ")
           .append(time)
           .append(" sec. Memory used: ")

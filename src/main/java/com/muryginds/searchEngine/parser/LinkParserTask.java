@@ -1,17 +1,15 @@
 package com.muryginds.searchEngine.parser;
 
+import com.muryginds.searchEngine.model.Page;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RecursiveAction;
 import java.util.stream.Collectors;
-import com.muryginds.searchEngine.model.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
@@ -26,15 +24,15 @@ public class LinkParserTask extends RecursiveAction {
   private final String currentUrl;
   private final String fullUrl;
   private final Set<String> scanResults;
-  private final Map<String, Page> finalResults;
+  private final Set<Page> finalResults;
 
   public LinkParserTask(String siteUrl) {
-    this(siteUrl, "/", new TreeMap<>(), ConcurrentHashMap.newKeySet());
+    this(siteUrl, "/", ConcurrentHashMap.newKeySet(), ConcurrentHashMap.newKeySet());
   }
   public LinkParserTask(
       String rootUrl,
       String currentUrl,
-      Map<String, Page> finalResults,
+      Set<Page> finalResults,
       Set<String> scanResults) {
     this.rootUrl = rootUrl;
     this.currentUrl = currentUrl;
@@ -45,10 +43,6 @@ public class LinkParserTask extends RecursiveAction {
 
   @Override
   protected void compute() {
-
-    if (finalResults.containsKey(currentUrl)) {
-      return;
-    }
 
     List<LinkParserTask> processors = new ArrayList<>();
     try {
@@ -110,10 +104,10 @@ public class LinkParserTask extends RecursiveAction {
 
   private void addPageToResults(int responseCode, String content) {
     Page page = new Page(null, currentUrl, responseCode, content);
-    finalResults.put(currentUrl, page);
+    finalResults.add(page);
   }
 
-  public Map<String, Page> getResults() {
+  public Set<Page> getResults() {
     return finalResults;
   }
 }
