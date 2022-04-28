@@ -1,36 +1,42 @@
 package com.muryginds.searchEngine.parser;
 
-import com.muryginds.searchEngine.model.Page;
+import com.muryginds.searchEngine.model.WebPage;
+import com.muryginds.searchEngine.service.WebPageService;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class LinkParser {
 
+  private final WebPageService webPageService;
   private final ForkJoinPool forkJoinPool = new ForkJoinPool();
-  public void parse(String siteUrl) {
-    Runtime runtime = Runtime.getRuntime();
-    long start = System.currentTimeMillis();
-    long usage = runtime.totalMemory() - runtime.freeMemory();
 
-    LinkParserTask linkParserTask =
-        new LinkParserTask(siteUrl);
+  public void parse(String siteUrl) {
+
+    long start = System.currentTimeMillis();
+
+    LinkParserTask linkParserTask = new LinkParserTask(
+        siteUrl,
+        "/",
+        ConcurrentHashMap.newKeySet(),
+        webPageService);
+
     log.info("New scan started: {}", siteUrl);
 
-    forkJoinPool.invoke(linkParserTask);
+    Set<WebPage> result = forkJoinPool.invoke(linkParserTask);
+    webPageService.saveAll(result);
 
-    Set<Page> results = linkParserTask.getResults();
     double time = (System.currentTimeMillis() - start)/1000d;
-    usage = (runtime.totalMemory() - runtime.freeMemory() - usage)/1024/1024;
     StringBuilder builder = new StringBuilder();
-      builder.append("Scan finished. Total links: ")
-          .append(results.size())
-          .append(". Time: ")
+      builder.append("Scan finished. Time: ")
           .append(time)
-          .append(" sec. Memory used: ")
-          .append(usage)
-          .append(" mb.");
+          .append(" sec.");
     log.info(builder.toString());
   }
 }

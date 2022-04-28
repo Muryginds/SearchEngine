@@ -15,14 +15,14 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "pages")
+@Table(name = "page")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Page {
+public class WebPage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
