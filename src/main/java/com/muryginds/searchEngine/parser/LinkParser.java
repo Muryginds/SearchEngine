@@ -33,10 +33,6 @@ public class LinkParser {
     webPageService.saveAll(result);
 
     double time = (System.currentTimeMillis() - start)/1000d;
-    StringBuilder builder = new StringBuilder();
-      builder.append("Scan finished. Time: ")
-          .append(time)
-          .append(" sec.");
-    log.info(builder.toString());
+    log.info("Scan finished. Time: {} sec.", time);
   }
 }

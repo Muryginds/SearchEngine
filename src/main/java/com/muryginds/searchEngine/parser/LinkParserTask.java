@@ -49,6 +49,9 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
 
     List<LinkParserTask> processors = new ArrayList<>();
     try {
+      if (scanResults.contains(fullUrl)) {
+        return webPages;
+      }
       Document doc = Jsoup.connect(fullUrl).get();
       saveWebPage(doc);
       parseLinks(doc).forEach(element -> {

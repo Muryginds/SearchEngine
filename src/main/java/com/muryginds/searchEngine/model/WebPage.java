@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,7 +26,8 @@ import lombok.experimental.FieldDefaults;
 public class WebPage {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @SequenceGenerator(name = "page_seq", sequenceName = "page_id_seq", allocationSize = 3)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "page_seq")
     Integer id;
 
     @Column(name = "path")
