@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/search_engine
+    username: commonUser
+    password: SECRET_PASSWORD
+parsing:
+  user-agent: MurygindsParsingBot
+  referrer: https://github.com/Muryginds/SearchEngine
+web-interface: /admin
+sites:
+  - url: https://www.lenta.ru
+    name: Лента.ру
+  - url: https://www.skillbox.ru
+    name: Skillbox

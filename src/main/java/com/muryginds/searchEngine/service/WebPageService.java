@@ -25,4 +25,3 @@ public class WebPageService {
     return webPageRepository.findById(id);
   }
 }
-
