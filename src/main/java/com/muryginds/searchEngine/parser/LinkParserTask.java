@@ -56,7 +56,7 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
           try {
             Thread.sleep(URL_SCAN_WAIT_TIME);
           } catch (InterruptedException e) {
-            log.error(fullUrl + ": " + e.getLocalizedMessage());
+            log.error("{}: {}", fullUrl, e.getLocalizedMessage());
           }
           LinkParserTask processor =
               new LinkParserTask(rootUrl, element, scanResults, webPageService);

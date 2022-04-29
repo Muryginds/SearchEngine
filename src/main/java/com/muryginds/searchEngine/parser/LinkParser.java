@@ -16,15 +16,18 @@ public class LinkParser {
 
   private final WebPageService webPageService;
   private final ForkJoinPool forkJoinPool = new ForkJoinPool();
+  private static final String CURRENT_URL = "/";
 
   public void parse(String siteUrl) {
 
     long start = System.currentTimeMillis();
+    Set<String> startingSet = ConcurrentHashMap.newKeySet();
+    startingSet.add(CURRENT_URL);
 
     LinkParserTask linkParserTask = new LinkParserTask(
         siteUrl,
-        "/",
-        ConcurrentHashMap.newKeySet(),
+        CURRENT_URL,
+        startingSet,
         webPageService);
 
     log.info("New scan started: {}", siteUrl);
@@ -32,11 +35,9 @@ public class LinkParser {
     Set<WebPage> result = forkJoinPool.invoke(linkParserTask);
     webPageService.saveAll(result);
 
+    startingSet.clear();
+
     double time = (System.currentTimeMillis() - start)/1000d;
-    StringBuilder builder = new StringBuilder();
-      builder.append("Scan finished. Time: ")
-          .append(time)
-          .append(" sec.");
-    log.info(builder.toString());
+    log.info("Scan finished. Time: {} sec.", time);
   }
 }
