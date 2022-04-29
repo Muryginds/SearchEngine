@@ -1,5 +1,6 @@
 package com.muryginds.searchEngine.parser;
 
+import com.muryginds.searchEngine.model.Site;
 import com.muryginds.searchEngine.model.WebPage;
 import com.muryginds.searchEngine.service.WebPageService;
 import java.io.IOException;
@@ -26,22 +27,25 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
   private static final int URL_SCAN_WAIT_TIME = 150;
   private static final int MAX_PAGES_SIZE = 200;
   private final WebPageService webPageService;
-  private final String rootUrl;
   private final String currentUrl;
   private final String fullUrl;
   private final Set<String> scanResults;
+  private final ParseConfiguration configuration;
+  private final Site site;
   private Set<WebPage> webPages = new HashSet<>();
 
   public LinkParserTask(
-      String rootUrl,
       String currentUrl,
       Set<String> scanResults,
-      WebPageService webPageService) {
-    this.rootUrl = rootUrl;
+      WebPageService webPageService,
+      ParseConfiguration configuration,
+      Site site) {
     this.currentUrl = currentUrl;
-    this.fullUrl = rootUrl + currentUrl;
+    this.fullUrl = site.getUrl() + currentUrl;
     this.scanResults = scanResults;
     this.webPageService = webPageService;
+    this.configuration = configuration;
+    this.site = site;
   }
 
   @Override
@@ -49,7 +53,8 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
 
     List<LinkParserTask> processors = new ArrayList<>();
     try {
-      Document doc = Jsoup.connect(fullUrl).get();
+      Document doc = Jsoup.connect(fullUrl).userAgent(configuration.getUserAgent())
+          .referrer(configuration.getReferrer()).get();
       saveWebPage(doc);
       parseLinks(doc).forEach(element -> {
         if (scanResults.add(element)) {
@@ -59,7 +64,7 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
             log.error("{}: {}", fullUrl, e.getLocalizedMessage());
           }
           LinkParserTask processor =
-              new LinkParserTask(rootUrl, element, scanResults, webPageService);
+              new LinkParserTask(element, scanResults, webPageService, configuration, site);
           processor.fork();
           processors.add(processor);
         }
@@ -118,7 +123,7 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
   }
 
   private void addToResults(int responseCode, String content) {
-    WebPage webPage = new WebPage(null, currentUrl, responseCode, content);
+    WebPage webPage = new WebPage(null, site, currentUrl, responseCode, content);
     webPages.add(webPage);
   }
 
