@@ -1,4 +1,4 @@
-package com.muryginds.searchEngine.model;
+package com.muryginds.searchEngine.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

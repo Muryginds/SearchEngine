@@ -1,7 +1,7 @@
 package com.muryginds.searchEngine.parser;
 
-import com.muryginds.searchEngine.model.Site;
-import com.muryginds.searchEngine.model.WebPage;
+import com.muryginds.searchEngine.entity.Site;
+import com.muryginds.searchEngine.entity.WebPage;
 import com.muryginds.searchEngine.service.WebPageService;
 import java.io.IOException;
 import java.net.ConnectException;
@@ -15,38 +15,26 @@ import java.util.Set;
 import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 @Slf4j
+@RequiredArgsConstructor
 public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
 
   private static final String FILE_PATTERN = ".*\\..[^ht].*";
   private static final int URL_SCAN_WAIT_TIME = 150;
   private static final int MAX_PAGES_SIZE = 200;
-  private final WebPageService webPageService;
   private final String currentUrl;
   private final String fullUrl;
   private final Set<String> scanResults;
   private final ParseConfiguration configuration;
   private final Site site;
+  private final WebPageService webPageService;
   private Set<WebPage> webPages = new HashSet<>();
-
-  public LinkParserTask(
-      String currentUrl,
-      Set<String> scanResults,
-      WebPageService webPageService,
-      ParseConfiguration configuration,
-      Site site) {
-    this.currentUrl = currentUrl;
-    this.fullUrl = site.getUrl() + currentUrl;
-    this.scanResults = scanResults;
-    this.webPageService = webPageService;
-    this.configuration = configuration;
-    this.site = site;
-  }
 
   @Override
   protected Set<WebPage> compute() {
@@ -63,8 +51,8 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
           } catch (InterruptedException e) {
             log.error("{}: {}", fullUrl, e.getLocalizedMessage());
           }
-          LinkParserTask processor =
-              new LinkParserTask(element, scanResults, webPageService, configuration, site);
+          LinkParserTask processor = new LinkParserTask(
+              element, fullUrl + element, scanResults, configuration, site, webPageService);
           processor.fork();
           processors.add(processor);
         }

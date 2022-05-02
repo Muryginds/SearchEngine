@@ -1,6 +1,6 @@
 package com.muryginds.searchEngine.service;
 
-import com.muryginds.searchEngine.model.WebPage;
+import com.muryginds.searchEngine.entity.WebPage;
 import com.muryginds.searchEngine.repository.WebPageRepository;
 import java.util.Collection;
 import java.util.Optional;

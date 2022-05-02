@@ -1,6 +1,6 @@
 package com.muryginds.searchEngine.repository;
 
-import com.muryginds.searchEngine.model.WebPage;
+import com.muryginds.searchEngine.entity.WebPage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

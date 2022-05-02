@@ -8,9 +8,13 @@ import org.springframework.stereotype.Component;
 @Getter
 public class ParseConfiguration {
 
-  @Value("${parsing.user-agent:'SiteParsingBot'}")
-  private String userAgent;
+  private final String userAgent;
+  private final String referrer;
 
-  @Value("${parsing.referrer:'https://github.com/'}")
-  private String referrer;
+  public ParseConfiguration(
+      @Value("${parsing.user-agent:'SiteParsingBot'}") String userAgent,
+      @Value("${parsing.referrer:'https://github.com/'}") String referrer) {
+    this.userAgent = userAgent;
+    this.referrer = referrer;
+  }
 }

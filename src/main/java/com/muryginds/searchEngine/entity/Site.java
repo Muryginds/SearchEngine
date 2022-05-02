@@ -1,4 +1,4 @@
-package com.muryginds.searchEngine.model;
+package com.muryginds.searchEngine.entity;
 
 import com.muryginds.searchEngine.parser.ParsingStatus;
 import java.time.LocalDateTime;
