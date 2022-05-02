@@ -1,7 +1,7 @@
 package com.muryginds.searchEngine.parser;
 
-import com.muryginds.searchEngine.model.Site;
-import com.muryginds.searchEngine.model.WebPage;
+import com.muryginds.searchEngine.entity.Site;
+import com.muryginds.searchEngine.entity.WebPage;
 import com.muryginds.searchEngine.service.SiteService;
 import com.muryginds.searchEngine.service.WebPageService;
 import java.time.LocalDateTime;
