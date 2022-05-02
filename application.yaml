@@ -3,12 +3,16 @@ spring:
     url: jdbc:postgresql://localhost:5432/search_engine
     username: commonUser
     password: SECRET_PASSWORD
+web-interface: /admin
 parsing:
   user-agent: MurygindsParsingBot
   referrer: https://github.com/Muryginds/SearchEngine
-web-interface: /admin
 sites:
-  - url: https://www.lenta.ru
-    name: Лента.ру
   - url: https://www.skillbox.ru
     name: Skillbox
+  - url: https://www.tatparts.ru
+    name: Татпартс.ру
+  - url: https://www.lutherancathedral.ru/
+    name: cathedral
+  - url: https://ipfran.ru/
+    name: IPF Ran

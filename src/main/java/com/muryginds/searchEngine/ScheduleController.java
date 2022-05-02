@@ -1,22 +1,27 @@
 package com.muryginds.searchEngine;
 
 import com.muryginds.searchEngine.parser.LinkParser;
-import com.muryginds.searchEngine.parser.ParseConfiguration;
+import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
+@ConfigurationProperties
 @RequiredArgsConstructor
 public class ScheduleController {
-
-  private static final String URL = "https://skillbox.ru";
-  private static final String SITE_NAME = "skillbox.ru";
+  @Setter
+  private List<Map<String, String>> sites;
   private final LinkParser linkParser;
-  private final ParseConfiguration configuration;
 
-  @Scheduled(fixedDelay = 100)
+  @Scheduled(fixedDelayString = "P1D")
   public void siteScanner() {
-    linkParser.parse(URL, SITE_NAME, configuration);
+    for (Map<String, String> siteParams : sites) {
+      linkParser.parse(siteParams.get("url"), siteParams.get("name"));
+      break;
+    }
   }
 }

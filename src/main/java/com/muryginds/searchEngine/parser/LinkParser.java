@@ -17,12 +17,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LinkParser {
 
+  private static final String STARTING_URL = "/";
+  private static final ForkJoinPool forkJoinPool = new ForkJoinPool();
   private final WebPageService webPageService;
   private final SiteService siteService;
-  private final ForkJoinPool forkJoinPool = new ForkJoinPool();
-  private static final String STARTING_URL = "/";
+  private final ParseConfiguration parseConfiguration;
 
-  public void parse(String siteUrl, String siteName, ParseConfiguration configuration) {
+  public void parse(String siteUrl, String siteName) {
 
     long start = System.currentTimeMillis();
     Set<String> startingSet = ConcurrentHashMap.newKeySet();
@@ -36,10 +37,11 @@ public class LinkParser {
 
     LinkParserTask linkParserTask = new LinkParserTask(
         STARTING_URL,
+        siteUrl + STARTING_URL,
         startingSet,
-        webPageService,
-        configuration,
-        site);
+        parseConfiguration,
+        site,
+        webPageService);
 
     log.info("New scan started: {}", siteUrl);
 
