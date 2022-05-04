@@ -12,7 +12,7 @@ sites:
     name: Skillbox
   - url: https://www.tatparts.ru
     name: Татпартс.ру
-  - url: https://www.lutherancathedral.ru/
+  - url: https://www.lutherancathedral.ru
     name: cathedral
-  - url: https://ipfran.ru/
+  - url: https://ipfran.ru
     name: IPF Ran
