@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/search_engine
+    url: jdbc:postgresql://localhost:5432/search_engine?stringtype=unspecified
     username: commonUser
     password: SECRET_PASSWORD
 web-interface: /admin
@@ -8,10 +8,16 @@ parsing:
   user-agent: MurygindsParsingBot
   referrer: https://github.com/Muryginds/SearchEngine
 sites:
-  - url: https://www.skillbox.ru
-    name: Skillbox
   - url: https://www.tatparts.ru
     name: Татпартс.ру
+  - url: http://www.playback.ru
+    name: playback
+  - url: https://volochek.life
+    name: volochek
+  - url: http://radiomv.ru
+    name: radiomv
+  - url: https://www.skillbox.ru
+    name: Skillbox
   - url: https://www.lutherancathedral.ru
     name: cathedral
   - url: https://ipfran.ru
