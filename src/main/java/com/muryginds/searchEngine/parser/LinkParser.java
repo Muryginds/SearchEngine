@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LinkParser {
 
-  private static final ForkJoinPool forkJoinPool = new ForkJoinPool();
+  private static final ForkJoinPool forkJoinPool = ForkJoinPool.commonPool();
   private final WebPageService webPageService;
   private final SiteService siteService;
   private final ParseConfiguration parseConfiguration;

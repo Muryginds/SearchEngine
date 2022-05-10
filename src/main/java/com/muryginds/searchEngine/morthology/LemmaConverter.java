@@ -6,18 +6,41 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.lucene.morphology.LuceneMorphology;
+import org.apache.lucene.morphology.english.EnglishLuceneMorphology;
 import org.apache.lucene.morphology.russian.RussianLuceneMorphology;
+import org.springframework.stereotype.Component;
 
+@Component
 public class LemmaConverter {
 
+  private static final String RUS_PATTERN = "[^А-я]";
+  private static final String ENG_PATTERN = "[\\W\\d_]";
   private static final String[] LIST_SPECIAL_WORDS = {"ПРЕДЛ", "СОЮЗ", "МЕЖД", "ЧАСТ"};
 
-  public Map<String, Integer> convert(String string) throws IOException {
+  public Map<String, Integer> convert(String string, LemmaLanguage language)
+      throws IOException, WrongLanguageException {
+    String pattern;
+    LuceneMorphology morphology;
+    switch (language) {
+      case RUS -> {
+        pattern = RUS_PATTERN;
+        morphology = new RussianLuceneMorphology();
+      }
+      case ENG -> {
+        pattern = ENG_PATTERN;
+        morphology = new EnglishLuceneMorphology();
+      }
+      default -> throw new WrongLanguageException(language);
+    }
 
-    LuceneMorphology luceneMorph = new RussianLuceneMorphology();
+    return getResults(string, pattern, morphology);
+  }
+
+  private Map<String, Integer> getResults(
+      String string, String pattern, LuceneMorphology luceneMorph) {
     String[] array = string
         .toLowerCase(Locale.ROOT)
-        .replaceAll("[^А-я]", " ")
+        .replaceAll(pattern, " ")
         .split(" ");
     return Arrays.stream(array)
         .filter(s -> !s.isEmpty())

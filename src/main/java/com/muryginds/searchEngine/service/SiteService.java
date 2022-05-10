@@ -1,8 +1,9 @@
 package com.muryginds.searchEngine.service;
 
 import com.muryginds.searchEngine.entity.Site;
+import com.muryginds.searchEngine.parser.ParsingStatus;
 import com.muryginds.searchEngine.repository.SiteRepository;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,12 +26,8 @@ public class SiteService {
     });
   }
 
-  public void saveAll(Collection<Site> collection) {
-    siteRepository.saveAll(collection);
-  }
-
-  public Optional<Site> findById(int id) {
-    return siteRepository.findById(id);
+  public List<Site> findParsed() {
+    return siteRepository.findAllByStatus(ParsingStatus.INDEXED);
   }
 
   public Optional<Site> findByUrl(String url) {

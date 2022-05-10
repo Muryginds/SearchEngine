@@ -25,7 +25,7 @@ import lombok.experimental.FieldDefaults;
 public class WebPage {
 
     @Id
-    @SequenceGenerator(name = "page_seq", sequenceName = "page_id_seq", allocationSize = 3)
+    @SequenceGenerator(name = "page_seq", sequenceName = "page_id_seq", allocationSize = 30)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "page_seq")
     Integer id;
 
