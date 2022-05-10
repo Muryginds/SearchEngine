@@ -8,6 +8,8 @@ parsing:
   user-agent: MurygindsParsingBot
   referrer: https://github.com/Muryginds/SearchEngine
 sites:
+  - url: https://www.skillbox.ru
+    name: Skillbox
   - url: https://www.tatparts.ru
     name: Татпартс.ру
   - url: http://www.playback.ru

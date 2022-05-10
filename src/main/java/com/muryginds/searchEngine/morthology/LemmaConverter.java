@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class LemmaConverter {
 
   private static final String RUS_PATTERN = "[^А-я]";
-  private static final String ENG_PATTERN = "[\\W\\d]";
+  private static final String ENG_PATTERN = "[\\W\\d_]";
   private static final String[] LIST_SPECIAL_WORDS = {"ПРЕДЛ", "СОЮЗ", "МЕЖД", "ЧАСТ"};
 
   public Map<String, Integer> convert(String string, LemmaLanguage language)
