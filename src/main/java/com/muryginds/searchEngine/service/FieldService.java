@@ -12,7 +12,7 @@ public class FieldService {
 
   private final FieldRepository fieldRepository;
 
-  public List<Field> findAll () {
+  public List<Field> findAll() {
     return fieldRepository.findAll();
   }
 }

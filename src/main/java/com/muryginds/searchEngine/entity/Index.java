@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,11 +25,12 @@ import lombok.experimental.FieldDefaults;
 public class Index {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @SequenceGenerator(name = "index_seq", sequenceName = "index_id_seq", allocationSize = 30)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "index_seq")
   Integer id;
 
   @ManyToOne
-  WebPage webPage;
+  WebPage page;
 
   @ManyToOne
   Lemma lemma;

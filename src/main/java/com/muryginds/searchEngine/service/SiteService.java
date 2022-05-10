@@ -3,7 +3,6 @@ package com.muryginds.searchEngine.service;
 import com.muryginds.searchEngine.entity.Site;
 import com.muryginds.searchEngine.parser.ParsingStatus;
 import com.muryginds.searchEngine.repository.SiteRepository;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -30,11 +29,6 @@ public class SiteService {
   public List<Site> findParsed() {
     return siteRepository.findAllByStatus(ParsingStatus.INDEXED);
   }
-
-  public void saveAll(Collection<Site> collection) {
-    siteRepository.saveAll(collection);
-  }
-
 
   public Optional<Site> findByUrl(String url) {
     return siteRepository.findByUrl(url);

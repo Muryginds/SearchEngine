@@ -5,6 +5,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,8 +25,12 @@ import lombok.experimental.FieldDefaults;
 public class Lemma {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @SequenceGenerator(name = "lemma_seq", sequenceName = "lemma_id_seq", allocationSize = 30)
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "lemma_seq")
   Integer id;
+
+  @ManyToOne
+  Site site;
 
   @Column(name = "lemma")
   String lemma;

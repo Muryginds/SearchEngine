@@ -10,7 +10,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WebPageRepository extends JpaRepository<WebPage, Integer> {
     Page<WebPage> findPageBySiteAndCode(Site site, Integer code, Pageable pageable);
-
-    int countBySite(Site site);
-
 }
