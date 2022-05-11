@@ -48,6 +48,8 @@ public class PageIndexer {
         .collect(Collectors.toMap(Field::getSelector, Field::getWeight));
     Pageable pageable = PageRequest.ofSize(MAX_PAGES_SIZE);
     for (Site site : sites) {
+      long start = System.currentTimeMillis();
+      log.info("New indexer started: {}", site.getUrl());
       Page<WebPage> webPages = webPageService
           .getPageParsedWithCode(site, PAGE_SUCCESSFULLY_PARSED_CODE, pageable);
       while (webPages.getContent().size() > 0) {
@@ -76,6 +78,8 @@ public class PageIndexer {
         webPages = webPageService
             .getPageParsedWithCode(site,PAGE_SUCCESSFULLY_PARSED_CODE, pageable.next());
       }
+      double time = (System.currentTimeMillis() - start)/1000d;
+      log.info("Indexer finished. Time: {} sec.", time);
     }
   }
 }
