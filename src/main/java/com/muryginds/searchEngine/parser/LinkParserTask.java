@@ -13,9 +13,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.RecursiveAction;
 import java.util.concurrent.RecursiveTask;
 import java.util.stream.Collectors;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.HttpStatusException;
@@ -23,7 +23,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 @Slf4j
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
 
   private static final String FILE_PATTERN = ".*\\..[^ht].*";
@@ -31,11 +31,11 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
   private static final int URL_SCAN_WAIT_TIME = 500;
   private static final int MAX_PAGES_SIZE = 90;
   private static String rootUrl;
+  private static ParseConfiguration configuration;
+  private static WebPageService pageService;
   private final String currentUrl;
   private final Set<String> scanResults;
-  private final ParseConfiguration configuration;
   private final Site site;
-  private final WebPageService webPageService;
   private String fullUrl;
   private Set<WebPage> webPages = new HashSet<>();
 
@@ -46,12 +46,12 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
     this(
         STARTING_URL,
         ConcurrentHashMap.newKeySet(),
-        parseConfiguration,
-        site,
-        webPageService);
+        site);
     scanResults.clear();
     scanResults.add(STARTING_URL);
     rootUrl = site.getUrl().replaceFirst("www.", "");
+    configuration = parseConfiguration;
+    pageService = webPageService;
   }
 
   @Override
@@ -65,27 +65,22 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
           .referrer(configuration.getReferrer())
           .get();
       saveWebPage(doc);
-      parseLinks(doc).forEach(element -> {
+      for (String element : parseLinks(doc)) {
         if (scanResults.add(element)) {
-          try {
-            Thread.sleep(URL_SCAN_WAIT_TIME);
-          } catch (InterruptedException e) {
-            log.error("{}: {}", fullUrl, e.getLocalizedMessage());
-          }
-          LinkParserTask processor = new LinkParserTask(
-              element, scanResults, configuration, site, webPageService);
+          Thread.sleep(URL_SCAN_WAIT_TIME);
+          LinkParserTask processor = new LinkParserTask(element, scanResults, site);
           processor.fork();
           processors.add(processor);
         }
-      });
+      }
     } catch (HttpStatusException e) {
       saveWebPage(e);
     } catch (ConnectException e) {
       log.info("Error connecting: {}", fullUrl);
     } catch (UnknownHostException e) {
       log.warn("Wrong host: {}", fullUrl);
-    } catch (IOException e) {
-      log.error("{} : {}", e.getLocalizedMessage(), fullUrl);
+    } catch (IOException | InterruptedException e) {
+      log.error("{} : {}", fullUrl, e.getLocalizedMessage());
     }
 
     for (LinkParserTask result : processors) {
@@ -143,12 +138,6 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
   }
 
   private void saveToDB(Collection<WebPage> collection) {
-    RecursiveAction action = new RecursiveAction() {
-      @Override
-      protected void compute() {
-        webPageService.saveAll(collection);
-      }
-    };
-    action.invoke();
+    pageService.saveAll(collection);
   }
 }
