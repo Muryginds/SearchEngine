@@ -5,6 +5,7 @@ import com.muryginds.searchEngine.entity.WebPage;
 import com.muryginds.searchEngine.service.SiteService;
 import com.muryginds.searchEngine.service.WebPageService;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,15 @@ public class LinkParser {
   private final SiteService siteService;
   private final ParseConfiguration parseConfiguration;
 
-  public void parse(String siteUrl, String siteName) {
+  public Site parse(String siteUrl, String siteName) {
 
     long start = System.currentTimeMillis();
 
-    Site site = siteService.getSite(siteUrl);
+    Optional<Site> search = siteService.findSite(siteUrl);
+    search.ifPresent(siteService::delete);
+
+    Site site = new Site();
+    site.setUrl(siteUrl);
     site.setName(siteName);
     site.setStatus(ParsingStatus.INDEXING);
     site.setStatusTime(LocalDateTime.now());
@@ -44,7 +49,9 @@ public class LinkParser {
     site.setStatus(ParsingStatus.INDEXED);
     siteService.save(site);
 
-    double time = (System.currentTimeMillis() - start)/1000d;
+    double time = (System.currentTimeMillis() - start) / 1000d;
     log.info("Scan finished. Time: {} sec.", time);
+
+    return site;
   }
 }

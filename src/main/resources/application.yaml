@@ -11,5 +11,5 @@ spring:
         order_inserts: true
         order_updates: true
         jdbc:
-          batch_size: 30
-          fetch_size: 30
+          batch_size: 60
+          fetch_size: 60

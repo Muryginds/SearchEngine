@@ -32,9 +32,9 @@ CREATE TABLE IF NOT EXISTS page (
 	path TEXT NOT NULL,
 	code INTEGER NOT NULL,
 	content TEXT NOT NULL,
-	FOREIGN KEY (site_id) REFERENCES site (id)
+	FOREIGN KEY (site_id) REFERENCES site (id) ON DELETE CASCADE
 );
-ALTER SEQUENCE page_id_seq OWNED BY page.id INCREMENT BY 3;
+ALTER SEQUENCE page_id_seq OWNED BY page.id INCREMENT BY 30;
 
 CREATE SEQUENCE IF NOT EXISTS lemma_id_seq;
 CREATE TABLE IF NOT EXISTS lemma (
@@ -42,9 +42,9 @@ CREATE TABLE IF NOT EXISTS lemma (
 	site_id INTEGER NOT NULL,
 	lemma VARCHAR(255) NOT NULL,
 	frequency INTEGER NOT NULL,
-	FOREIGN KEY (site_id) REFERENCES site (id)
+	FOREIGN KEY (site_id) REFERENCES site (id) ON DELETE CASCADE
 );
-ALTER SEQUENCE lemma_id_seq OWNED BY lemma.id INCREMENT BY 3;
+ALTER SEQUENCE lemma_id_seq OWNED BY lemma.id INCREMENT BY 30;
 
 CREATE SEQUENCE IF NOT EXISTS index_id_seq;
 CREATE TABLE IF NOT EXISTS index (
@@ -52,10 +52,10 @@ CREATE TABLE IF NOT EXISTS index (
 	page_id INTEGER NOT NULL,
 	lemma_id INTEGER NOT NULL,
 	rank FLOAT NOT NULL,
-	FOREIGN KEY (page_id) REFERENCES page (id),
-  FOREIGN KEY (lemma_id) REFERENCES lemma (id)
+	FOREIGN KEY (page_id) REFERENCES page (id) ON DELETE CASCADE,
+  	FOREIGN KEY (lemma_id) REFERENCES lemma (id) ON DELETE CASCADE
 );
-ALTER SEQUENCE index_id_seq OWNED BY index.id INCREMENT BY 3;
+ALTER SEQUENCE index_id_seq OWNED BY index.id INCREMENT BY 30;
 
 INSERT INTO field (name, selector, weight)
 VALUES ('title', 'title', 1.0),
