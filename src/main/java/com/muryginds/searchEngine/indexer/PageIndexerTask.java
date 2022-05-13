@@ -2,7 +2,6 @@ package com.muryginds.searchEngine.indexer;
 
 import com.muryginds.searchEngine.entity.WebPage;
 import com.muryginds.searchEngine.morthology.LemmaConverter;
-import com.muryginds.searchEngine.morthology.LemmaLanguage;
 import com.muryginds.searchEngine.morthology.WrongLanguageException;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -28,8 +27,7 @@ public class PageIndexerTask implements Callable<Map<String, Integer>> {
     for (Map.Entry<String, BigDecimal> field : fields.entrySet()) {
       String text = doc.getElementsByTag(field.getKey()).text();
       try {
-        addResults(lemmaConverter.convert(text, LemmaLanguage.RUS), field.getValue());
-        addResults(lemmaConverter.convert(text, LemmaLanguage.ENG), field.getValue());
+        addResults(lemmaConverter.convert(text), field.getValue());
       } catch (IOException | WrongLanguageException e) {
         log.error("Site {} : {} : {}",
             webPage.getSite().getUrl() + webPage.getPath(), field.getKey(), e.getLocalizedMessage());
