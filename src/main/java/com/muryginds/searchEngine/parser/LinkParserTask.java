@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RecursiveTask;
@@ -57,20 +56,20 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
   @Override
   protected Set<WebPage> compute() {
 
-    List<LinkParserTask> processors = new ArrayList<>();
+    var processors = new ArrayList<LinkParserTask>();
     try {
       fullUrl = rootUrl + (currentUrl.equals("/") ? "" : currentUrl);
-      Document doc = Jsoup.connect(fullUrl)
+      var document = Jsoup.connect(fullUrl)
           .userAgent(configuration.getUserAgent())
           .referrer(configuration.getReferrer())
           .get();
-      saveWebPage(doc);
-      for (String element : parseLinks(doc)) {
-        if (scanResults.add(element)) {
+      saveWebPage(document);
+      for (var parsedLink : parseLinks(document)) {
+        if (scanResults.add(parsedLink)) {
           Thread.sleep(URL_SCAN_WAIT_TIME);
-          LinkParserTask processor = new LinkParserTask(element, scanResults, site);
-          processor.fork();
-          processors.add(processor);
+          var parserTask = new LinkParserTask(parsedLink, scanResults, site);
+          parserTask.fork();
+          processors.add(parserTask);
         }
       }
     } catch (HttpStatusException e) {
@@ -83,8 +82,8 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
       log.error("{} : {}", fullUrl, e.getLocalizedMessage());
     }
 
-    for (LinkParserTask result : processors) {
-      Set<WebPage> pages = result.join();
+    for (var parserTask : processors) {
+      var pages = parserTask.join();
       if (pages.size() > MAX_PAGES_SIZE) {
         saveToDB(pages);
         pages = Collections.emptySet();
@@ -102,7 +101,7 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
   }
 
   public Set<String> parseLinks(Document document) {
-    Set<String> links = document.select("a[href^=/]")
+    var links = document.select("a[href^=/]")
           .stream()
           .map(e -> e.attr("href"))
           .filter(s -> !s.contains("?") && !s.contains("#") && !s.matches(FILE_PATTERN))
@@ -123,17 +122,17 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
   }
 
   private void saveWebPage(Document doc) {
-    int responseCode = doc.connection().response().statusCode();
+    var responseCode = doc.connection().response().statusCode();
     addToResults(responseCode, doc.html());
   }
 
   private void saveWebPage(HttpStatusException e) {
-    int responseCode = e.getStatusCode();
+    var responseCode = e.getStatusCode();
     addToResults(responseCode, "");
   }
 
   private void addToResults(int responseCode, String content) {
-    WebPage webPage = new WebPage(null, site, currentUrl, responseCode, content);
+    var webPage = new WebPage(null, site, currentUrl, responseCode, content);
     webPages.add(webPage);
   }
 

@@ -25,7 +25,7 @@ public class PageIndexerTask implements Callable<Map<String, Integer>> {
   public Map<String, Integer> call() {
     Document doc = Jsoup.parse(webPage.getContent());
     for (Map.Entry<String, BigDecimal> field : fields.entrySet()) {
-      String text = doc.getElementsByTag(field.getKey()).text();
+      var text = doc.getElementsByTag(field.getKey()).text();
       try {
         addResults(lemmaConverter.convert(text), field.getValue());
       } catch (IOException | WrongLanguageException e) {

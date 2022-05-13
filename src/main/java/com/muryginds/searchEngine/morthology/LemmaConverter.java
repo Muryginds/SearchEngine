@@ -53,11 +53,11 @@ public class LemmaConverter {
 
   private Map<String, Integer> getResults(
       String string, String pattern, LuceneMorphology luceneMorph, String[] specialWord) {
-    String[] array = string
+    var words = string
         .toLowerCase(Locale.ROOT)
         .replaceAll(pattern, " ")
         .split(" ");
-    return Arrays.stream(array)
+    return Arrays.stream(words)
         .filter(s -> !s.isEmpty())
         .flatMap(s -> luceneMorph.getNormalForms(s).stream().limit(1))
         .filter(s -> {

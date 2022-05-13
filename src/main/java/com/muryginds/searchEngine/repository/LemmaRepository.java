@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LemmaRepository extends JpaRepository<Lemma, Integer> {
   List<Lemma> findAllBySiteAndLemmaIn(Site site, Collection<String> lemmas);
+  List<Lemma> findAllByLemmaIn(Collection<String> lemmas);
 }
