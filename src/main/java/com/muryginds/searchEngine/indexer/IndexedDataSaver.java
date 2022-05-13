@@ -24,7 +24,7 @@ public class IndexedDataSaver {
 
   public void saveResults(Map<String, Integer> lemmas,
       Map<WebPage, Map<String, BigDecimal>> indexes, Site site) {
-    Map<String, Lemma> lemmasMap = lemmaService.findAll(lemmas.keySet(), site).stream()
+    var lemmasMap = lemmaService.findAll(lemmas.keySet(), site).stream()
         .collect(Collectors.toMap(Lemma::getLemma, v -> v));
     lemmas.forEach((k, v) ->
         lemmasMap.merge(
@@ -36,7 +36,7 @@ public class IndexedDataSaver {
             }
         )
     );
-    Set<Index> indexSet = indexes.entrySet().stream()
+    var indexSet = indexes.entrySet().stream()
         .flatMap(e -> e.getValue().entrySet().stream()
             .map(i -> new Index(
                     null,

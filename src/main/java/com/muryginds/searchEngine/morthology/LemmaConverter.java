@@ -2,6 +2,7 @@ package com.muryginds.searchEngine.morthology;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,6 +20,14 @@ public class LemmaConverter {
       {"ПРЕДЛ", "СОЮЗ", "МЕЖД", "ЧАСТ", "МС"};
   private static final String[] ENG_SPECIAL_WORDS =
       {"PREP", "CONJ", "PN", "ARTICLE", "INT"};
+
+  public Map<String, Integer> convert(String string) throws WrongLanguageException, IOException {
+    var result = new HashMap<String, Integer>();
+    for (var language : LemmaLanguage.values()) {
+      result.putAll(convert(string, language));
+    }
+    return result;
+  }
 
   public Map<String, Integer> convert(String string, LemmaLanguage language)
       throws IOException, WrongLanguageException {
@@ -44,11 +53,11 @@ public class LemmaConverter {
 
   private Map<String, Integer> getResults(
       String string, String pattern, LuceneMorphology luceneMorph, String[] specialWord) {
-    String[] array = string
+    var words = string
         .toLowerCase(Locale.ROOT)
         .replaceAll(pattern, " ")
         .split(" ");
-    return Arrays.stream(array)
+    return Arrays.stream(words)
         .filter(s -> !s.isEmpty())
         .flatMap(s -> luceneMorph.getNormalForms(s).stream().limit(1))
         .filter(s -> {

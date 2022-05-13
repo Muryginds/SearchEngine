@@ -1,12 +1,9 @@
 package com.muryginds.searchEngine.parser;
 
 import com.muryginds.searchEngine.entity.Site;
-import com.muryginds.searchEngine.entity.WebPage;
 import com.muryginds.searchEngine.service.SiteService;
 import com.muryginds.searchEngine.service.WebPageService;
 import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ForkJoinPool;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,12 +21,12 @@ public class LinkParser {
 
   public Site parse(String siteUrl, String siteName) {
 
-    long start = System.currentTimeMillis();
+    var start = System.currentTimeMillis();
 
-    Optional<Site> search = siteService.findSite(siteUrl);
+    var search = siteService.findSite(siteUrl);
     search.ifPresent(siteService::delete);
 
-    Site site = new Site();
+    var site = new Site();
     site.setUrl(siteUrl);
     site.setName(siteName);
     site.setStatus(ParsingStatus.INDEXING);
@@ -43,13 +40,13 @@ public class LinkParser {
 
     log.info("New scan started: {}", siteUrl);
 
-    Set<WebPage> result = forkJoinPool.invoke(linkParserTask);
+    var result = forkJoinPool.invoke(linkParserTask);
     webPageService.saveAll(result);
 
     site.setStatus(ParsingStatus.INDEXED);
     siteService.save(site);
 
-    double time = (System.currentTimeMillis() - start) / 1000d;
+    var time = (System.currentTimeMillis() - start) / 1000d;
     log.info("Scan finished. Time: {} sec.", time);
 
     return site;

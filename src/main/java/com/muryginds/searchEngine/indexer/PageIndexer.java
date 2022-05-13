@@ -76,14 +76,19 @@ public class PageIndexer {
         log.error("Parsing text failed : {}", e.getLocalizedMessage());
       }
 
-      indexedDataSaver.saveResults(lemmas, indexes, site);
-      indexes.clear();
-      lemmas.clear();
+      saveResults(site);
+
       pageable = pageable.next();
       pagesPage = webPageService
           .getPageParsedWithCode(site, PAGE_SUCCESSFULLY_PARSED_CODE, pageable);
     }
     var time = (System.currentTimeMillis() - start) / 1000d;
     log.info("Indexer finished. Time: {} sec.", time);
+  }
+
+  private void saveResults(Site site) {
+    indexedDataSaver.saveResults(lemmas, indexes, site);
+    indexes.clear();
+    lemmas.clear();
   }
 }
