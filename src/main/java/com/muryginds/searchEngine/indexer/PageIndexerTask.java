@@ -7,14 +7,14 @@ import com.muryginds.searchEngine.morthology.WrongLanguageException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.Callable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 @Slf4j
 @RequiredArgsConstructor
-public class PageIndexerTask extends RecursiveAction {
+public class PageIndexerTask implements Callable<Map<String, Integer>> {
 
   private final WebPage webPage;
   private final Map<String, BigDecimal> fields;
@@ -23,7 +23,7 @@ public class PageIndexerTask extends RecursiveAction {
   private final LemmaConverter lemmaConverter;
 
   @Override
-  protected void compute() {
+  public Map<String, Integer> call() {
     Document doc = Jsoup.parse(webPage.getContent());
     for (Map.Entry<String, BigDecimal> field : fields.entrySet()) {
       String text = doc.getElementsByTag(field.getKey()).text();
@@ -35,12 +35,13 @@ public class PageIndexerTask extends RecursiveAction {
             webPage.getSite().getUrl() + webPage.getPath(), field.getKey(), e.getLocalizedMessage());
       }
     }
+    return lemmas;
   }
 
-  private void addResults(Map<String, BigDecimal> map, BigDecimal multiplier) {
+  private void addResults(Map<String, Integer> map, BigDecimal multiplier) {
     map.forEach((key, value) -> {
-      lemmas.merge(key, 1, (v1, v2) -> v1 + 1);
-      indexes.merge(key, value.multiply(multiplier), BigDecimal::add);
+      lemmas.computeIfAbsent(key, v -> 1);
+      indexes.merge(key, BigDecimal.valueOf(value).multiply(multiplier), BigDecimal::add);
     });
   }
 }

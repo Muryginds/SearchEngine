@@ -1,7 +1,6 @@
 package com.muryginds.searchEngine.morthology;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
@@ -21,7 +20,7 @@ public class LemmaConverter {
   private static final String[] ENG_SPECIAL_WORDS =
       {"PREP", "CONJ", "PN", "ARTICLE", "INT"};
 
-  public Map<String, BigDecimal> convert(String string, LemmaLanguage language)
+  public Map<String, Integer> convert(String string, LemmaLanguage language)
       throws IOException, WrongLanguageException {
     String pattern;
     LuceneMorphology morphology;
@@ -43,7 +42,7 @@ public class LemmaConverter {
     return getResults(string, pattern, morphology, specialWords);
   }
 
-  private Map<String, BigDecimal> getResults(
+  private Map<String, Integer> getResults(
       String string, String pattern, LuceneMorphology luceneMorph, String[] specialWord) {
     String[] array = string
         .toLowerCase(Locale.ROOT)
@@ -57,10 +56,10 @@ public class LemmaConverter {
               .reduce("", (s1, s2) -> s2);
           return notSpecialWord(str, specialWord);
         })
-        .collect(Collectors.toMap(k -> k, v -> BigDecimal.valueOf(1), BigDecimal::add));
+        .collect(Collectors.toMap(k -> k, v -> 1, Integer::sum));
   }
 
   private boolean notSpecialWord(String string, String[] specialWords) {
-    return Arrays.stream(specialWords).noneMatch(string::startsWith);
+    return Arrays.stream(specialWords).noneMatch(string::contains);
   }
 }

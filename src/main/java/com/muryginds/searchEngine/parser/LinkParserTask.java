@@ -76,7 +76,7 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
     } catch (HttpStatusException e) {
       saveWebPage(e);
     } catch (ConnectException e) {
-      log.info("Error connecting: {}", fullUrl);
+      log.warn("Error connecting: {}", fullUrl);
     } catch (UnknownHostException e) {
       log.warn("Wrong host: {}", fullUrl);
     } catch (IOException | InterruptedException e) {
