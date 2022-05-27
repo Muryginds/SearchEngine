@@ -16,8 +16,8 @@ public class SiteService {
     siteRepository.save(site);
   }
 
-  public Optional<Site> findSite(String url) {
-    return findByUrl(url);
+  public Optional<Site> findSite(Site site) {
+    return findByUrl(site.getUrl());
   }
 
   public Optional<Site> findByUrl(String url) {
