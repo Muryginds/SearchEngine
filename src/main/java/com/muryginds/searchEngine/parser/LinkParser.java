@@ -19,26 +19,23 @@ public class LinkParser {
   private final SiteService siteService;
   private final ParseConfiguration parseConfiguration;
 
-  public Site parse(String siteUrl, String siteName) {
+  public void parse(Site site) {
 
     var start = System.currentTimeMillis();
 
-    var search = siteService.findSite(siteUrl);
-    search.ifPresent(siteService::delete);
+    siteService.findSite(site).ifPresent(siteService::delete);
 
-    var site = new Site();
-    site.setUrl(siteUrl);
-    site.setName(siteName);
     site.setStatus(ParsingStatus.INDEXING);
     site.setStatusTime(LocalDateTime.now());
     siteService.save(site);
 
-    LinkParserTask linkParserTask = new LinkParserTask(
-        parseConfiguration,
+    LinkParserTask linkParserTask = LinkParserTask.initialise(
         site,
-        webPageService);
+        parseConfiguration,
+        webPageService
+    );
 
-    log.info("New scan started: {}", siteUrl);
+    log.info("New scan started: {}", site.getUrl());
 
     var result = forkJoinPool.invoke(linkParserTask);
     webPageService.saveAll(result);
@@ -48,7 +45,5 @@ public class LinkParser {
 
     var time = (System.currentTimeMillis() - start) / 1000d;
     log.info("Scan finished. Time: {} sec.", time);
-
-    return site;
   }
 }

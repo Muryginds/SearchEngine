@@ -48,17 +48,17 @@ public class LemmaConverter {
       default -> throw new WrongLanguageException(language);
     }
 
-    return getResults(string, pattern, morphology, specialWords);
+    return countLemmas(string, pattern, morphology, specialWords);
   }
 
-  private Map<String, Integer> getResults(
+  private Map<String, Integer> countLemmas(
       String string, String pattern, LuceneMorphology luceneMorph, String[] specialWord) {
     var words = string
         .toLowerCase(Locale.ROOT)
         .replaceAll(pattern, " ")
         .split(" ");
     return Arrays.stream(words)
-        .filter(s -> !s.isEmpty())
+        .filter(s -> !s.isBlank())
         .flatMap(s -> luceneMorph.getNormalForms(s).stream().limit(1))
         .filter(s -> {
           String str = luceneMorph.getMorphInfo(s).stream().limit(1)

@@ -29,36 +29,30 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
   private static final String STARTING_URL = "/";
   private static final int URL_SCAN_WAIT_TIME = 500;
   private static final int MAX_PAGES_SIZE = 90;
-  private static String rootUrl;
-  private static ParseConfiguration configuration;
-  private static WebPageService pageService;
+  private final String rootUrl;
   private final String currentUrl;
+  private final String fullUrl;
   private final Set<String> scanResults;
   private final Site site;
-  private String fullUrl;
+  private final ParseConfiguration configuration;
+  private final WebPageService pageService;
   private Set<WebPage> webPages = new HashSet<>();
 
-  public LinkParserTask (
-      ParseConfiguration parseConfiguration,
+  public static LinkParserTask initialise(
       Site site,
-      WebPageService webPageService) {
-    this(
-        STARTING_URL,
-        ConcurrentHashMap.newKeySet(),
-        site);
-    scanResults.clear();
+      ParseConfiguration configuration,
+      WebPageService pageService) {
+    var rootUrl = site.getUrl().replaceFirst("www.", "");
+    Set<String> scanResults = ConcurrentHashMap.newKeySet();
     scanResults.add(STARTING_URL);
-    rootUrl = site.getUrl().replaceFirst("www.", "");
-    configuration = parseConfiguration;
-    pageService = webPageService;
+    return new LinkParserTask(
+                  rootUrl, STARTING_URL, rootUrl, scanResults, site, configuration, pageService);
   }
 
   @Override
   protected Set<WebPage> compute() {
-
     var processors = new ArrayList<LinkParserTask>();
     try {
-      fullUrl = rootUrl + (currentUrl.equals("/") ? "" : currentUrl);
       var document = Jsoup.connect(fullUrl)
           .userAgent(configuration.getUserAgent())
           .referrer(configuration.getReferrer())
@@ -67,9 +61,16 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
       for (var parsedLink : parseLinks(document)) {
         if (scanResults.add(parsedLink)) {
           Thread.sleep(URL_SCAN_WAIT_TIME);
-          var parserTask = new LinkParserTask(parsedLink, scanResults, site);
-          parserTask.fork();
+          var parserTask = new LinkParserTask(
+              rootUrl,
+              parsedLink,
+              rootUrl + currentUrl,
+              scanResults,
+              site,
+              configuration,
+              pageService);
           processors.add(parserTask);
+          parserTask.fork();
         }
       }
     } catch (HttpStatusException e) {
