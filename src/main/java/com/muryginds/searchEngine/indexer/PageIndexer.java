@@ -5,6 +5,7 @@ import com.muryginds.searchEngine.entity.Lemma;
 import com.muryginds.searchEngine.entity.Site;
 import com.muryginds.searchEngine.entity.WebPage;
 import com.muryginds.searchEngine.morthology.LemmaConverter;
+import com.muryginds.searchEngine.service.FieldService;
 import com.muryginds.searchEngine.service.IndexService;
 import com.muryginds.searchEngine.service.LemmaService;
 import com.muryginds.searchEngine.service.WebPageService;
@@ -22,48 +23,47 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class PageIndexer {
 
-  private static final int MAX_PAGES_SIZE = 60;
+  private static final int MAX_PAGES_SIZE = 5;
   private static final int PAGE_SUCCESSFULLY_PARSED_CODE = 200;
   private static final ExecutorService executorService = Executors.newWorkStealingPool();
   private final WebPageService webPageService;
   private final LemmaConverter lemmaConverter;
   private final LemmaService lemmaService;
+  private final FieldService fieldService;
   private final IndexService indexService;
-  private final Map<String, Integer> lemmas = new HashMap<>();
-  private final Map<WebPage, Map<String, BigDecimal>> indexes = new ConcurrentHashMap<>();
+  private Map<String, Integer> lemmas;
+  private Map<WebPage, Map<String, BigDecimal>> webPageIndexes;
 
-  public void index(Site site, Map<String, BigDecimal> fields) {
+  public void index(Site site) {
+    lemmas = new HashMap<>();
+    webPageIndexes = new ConcurrentHashMap<>();
     var pageable = PageRequest.ofSize(MAX_PAGES_SIZE);
     var start = System.currentTimeMillis();
     log.info("New indexer started: {}", site.getUrl());
-    var pagesPage = webPageService
-        .getPageParsedWithCode(site, PAGE_SUCCESSFULLY_PARSED_CODE, pageable);
+    var pagesPage = getPages(site, pageable);
     while (pagesPage.hasContent()) {
-      var indexingTasks = new ArrayList<Callable<Map<String, Integer>>>();
+      var indexingTasks = new ArrayList<Callable<IndexerResult>>();
 
       pagesPage.get().forEach(page -> {
-        var task = new PageIndexerTask(
-            page,
-            fields,
-            new HashMap<>(),
-            indexes.computeIfAbsent(page, v -> new HashMap<>()),
-            lemmaConverter);
+        var task = new PageIndexerTask(page, lemmaConverter, fieldService);
         indexingTasks.add(task);
       });
 
       try {
         var futureResults = executorService.invokeAll(indexingTasks);
         for (var futureResult : futureResults) {
-          futureResult.get().forEach((k, v) -> lemmas.merge(k, v, Integer::sum));
+          var indexerResult = futureResult.get();
+          indexerResult.getLemmas().forEach((k, v) -> lemmas.merge(k, v, Integer::sum));
+          webPageIndexes.put(indexerResult.getWebPage(), indexerResult.getIndexes());
         }
       } catch (InterruptedException | ExecutionException e) {
         log.error("Parsing text failed : {}", e.getLocalizedMessage());
@@ -72,8 +72,7 @@ public class PageIndexer {
       saveResults(site);
 
       pageable = pageable.next();
-      pagesPage = webPageService
-          .getPageParsedWithCode(site, PAGE_SUCCESSFULLY_PARSED_CODE, pageable);
+      pagesPage = getPages(site, pageable);
     }
     var time = (System.currentTimeMillis() - start) / 1000d;
     log.info("Indexer finished. Time: {} sec.", time);
@@ -92,7 +91,7 @@ public class PageIndexer {
             }
         )
     );
-    var indexSet = indexes.entrySet().stream()
+    var indexSet = webPageIndexes.entrySet().stream()
         .flatMap(e -> e.getValue().entrySet().stream()
             .map(i -> new Index(
                     null,
@@ -105,11 +104,15 @@ public class PageIndexer {
 
     saveToDb(lemmasMap.values(), indexSet);
 
-    indexes.clear();
+    webPageIndexes.clear();
     lemmas.clear();
   }
 
-  @Transactional
+  private Page<WebPage> getPages(Site site, PageRequest pageable) {
+    return webPageService
+        .getPageParsedWithCode(site, PAGE_SUCCESSFULLY_PARSED_CODE, pageable);
+  }
+
   private void saveToDb(Collection<Lemma> lemmas, Set<Index> indexes) {
     lemmaService.saveAll(lemmas);
     indexService.saveAll(indexes);

@@ -37,4 +37,28 @@ public class Lemma {
 
   @Column(name = "frequency")
   Integer frequency;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    Lemma lemma1 = (Lemma) o;
+
+    if (site != null ? !site.equals(lemma1.site) : lemma1.site != null) {
+      return false;
+    }
+    return lemma != null ? lemma.equals(lemma1.lemma) : lemma1.lemma == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = site != null ? site.hashCode() : 0;
+    result = 31 * result + (lemma != null ? lemma.hashCode() : 0);
+    return result;
+  }
 }

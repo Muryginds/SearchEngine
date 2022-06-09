@@ -64,7 +64,7 @@ public class LinkParserTask extends RecursiveTask<Set<WebPage>> {
           var parserTask = new LinkParserTask(
               rootUrl,
               parsedLink,
-              rootUrl + currentUrl,
+              rootUrl + parsedLink,
               scanResults,
               site,
               configuration,

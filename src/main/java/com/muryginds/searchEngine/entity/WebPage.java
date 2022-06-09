@@ -52,28 +52,16 @@ public class WebPage {
 
         WebPage webPage = (WebPage) o;
 
-        if (id != null ? !id.equals(webPage.id) : webPage.id != null) {
-            return false;
-        }
         if (site != null ? !site.equals(webPage.site) : webPage.site != null) {
             return false;
         }
-        if (path != null ? !path.equals(webPage.path) : webPage.path != null) {
-            return false;
-        }
-        if (code != null ? !code.equals(webPage.code) : webPage.code != null) {
-            return false;
-        }
-        return content != null ? content.equals(webPage.content) : webPage.content == null;
+        return path != null ? path.equals(webPage.path) : webPage.path == null;
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (site != null ? site.hashCode() : 0);
+        int result = site != null ? site.hashCode() : 0;
         result = 31 * result + (path != null ? path.hashCode() : 0);
-        result = 31 * result + (code != null ? code.hashCode() : 0);
-        result = 31 * result + (content != null ? content.hashCode() : 0);
         return result;
     }
 }
