@@ -69,6 +69,6 @@ public class LemmaConverter {
   }
 
   private boolean notSpecialWord(String string, String[] specialWords) {
-    return Arrays.stream(specialWords).noneMatch(string::contains);
+    return !Arrays.stream(specialWords).anyMatch(string::contains);
   }
 }

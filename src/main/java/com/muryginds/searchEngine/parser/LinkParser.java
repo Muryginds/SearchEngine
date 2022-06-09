@@ -23,7 +23,14 @@ public class LinkParser {
 
     var start = System.currentTimeMillis();
 
+    log.info("Clearing old site data: {}", site.getUrl());
     siteService.findSite(site).ifPresent(siteService::delete);
+
+    var time = (System.currentTimeMillis() - start) / 1000d;
+    log.info("Clearing finished. Time: {} sec.", time);
+
+    start = System.currentTimeMillis();
+    log.info("New scan started: {}", site.getUrl());
 
     site.setStatus(ParsingStatus.INDEXING);
     site.setStatusTime(LocalDateTime.now());
@@ -35,15 +42,13 @@ public class LinkParser {
         webPageService
     );
 
-    log.info("New scan started: {}", site.getUrl());
-
     var result = forkJoinPool.invoke(linkParserTask);
     webPageService.saveAll(result);
 
     site.setStatus(ParsingStatus.INDEXED);
     siteService.save(site);
 
-    var time = (System.currentTimeMillis() - start) / 1000d;
+    time = (System.currentTimeMillis() - start) / 1000d;
     log.info("Scan finished. Time: {} sec.", time);
   }
 }

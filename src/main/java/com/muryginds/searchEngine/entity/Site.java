@@ -45,4 +45,37 @@ public class Site {
 
   @Column(name = "name")
   String name;
+
+//  @OneToMany(orphanRemoval = true, cascade = CascadeType.REMOVE, mappedBy = "site", fetch = FetchType.LAZY)
+//  List<Lemma> lemmas;
+//  @OneToMany(orphanRemoval = true, cascade = CascadeType.REMOVE, mappedBy = "site", fetch = FetchType.LAZY)
+//  List<WebPage> pages;
+//
+//  public void removeLemma(Lemma lemma) {
+//    lemmas.remove(lemma);
+//  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    Site site = (Site) o;
+
+    if (url != null ? !url.equals(site.url) : site.url != null) {
+      return false;
+    }
+    return name != null ? name.equals(site.name) : site.name == null;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = url != null ? url.hashCode() : 0;
+    result = 31 * result + (name != null ? name.hashCode() : 0);
+    return result;
+  }
 }
