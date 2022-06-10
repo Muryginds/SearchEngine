@@ -64,4 +64,14 @@ public class WebPage {
         result = 31 * result + (path != null ? path.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "WebPage{" +
+            "id=" + id +
+            ", site=" + site.getUrl() +
+            ", path='" + path + '\'' +
+            ", code=" + code +
+            '}';
+    }
 }
