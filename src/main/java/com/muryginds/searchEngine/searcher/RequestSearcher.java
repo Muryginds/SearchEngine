@@ -1,4 +1,4 @@
-package com.muryginds.searchEngine.finder;
+package com.muryginds.searchEngine.searcher;
 
 import com.muryginds.searchEngine.entity.WebPage;
 import com.muryginds.searchEngine.morthology.LemmaConverter;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class WordsFinder {
+public class RequestSearcher {
 
   private final WebPageService webPageService;
   private final LemmaConverter lemmaConverter;
