@@ -21,8 +21,4 @@ public class LemmaService {
   public List<Lemma> findAll(Collection<String> lemmas, Site site) {
     return lemmaRepository.findAllBySiteAndLemmaIn(site, lemmas);
   }
-
-  public List<Lemma> findAll(Collection<String> lemmas) {
-    return lemmaRepository.findAllByLemmaIn(lemmas);
-  }
 }
